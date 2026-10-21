@@ -1,6 +1,7 @@
 package net.elihelper;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.StringWidget;
@@ -25,6 +26,11 @@ public class EliScreen extends Screen {
         return Component.translatable(key).withStyle(Style.EMPTY.withColor(TEXT_PURPLE));
     }
 
+    static StringWidget centered(Font font, Component c, int x, int y, int w) {
+        int tw = font.width(c);
+        return new StringWidget(x + (w - tw) / 2, y, tw, 10, c, font);
+    }
+
     @Override
     protected void init() {
         int x = (this.width - W) / 2;
@@ -35,12 +41,12 @@ public class EliScreen extends Screen {
         panelRight = x + W + 12;
         panelTop = y - 8;
 
-        addRenderableWidget(new StringWidget(x, y + 6, W, 12,
+        addRenderableWidget(centered(this.font,
                 Component.translatable("elihelper.title").withStyle(Style.EMPTY.withBold(true).withColor(TEXT_PURPLE)),
-                this.font).alignCenter());
+                x, y + 6, W));
         y += 24;
 
-        addRenderableWidget(new StringWidget(x, y, W, 10, purple("elihelper.section.commands"), this.font).alignCenter());
+        addRenderableWidget(centered(this.font, purple("elihelper.section.commands"), x, y, W));
         y += 14;
         for (EliConfig.CommandEntry entry : EliConfig.get().commands) {
             addRenderableWidget(Button.builder(Component.literal(entry.label), b -> sendCommand(entry.command))
@@ -49,7 +55,7 @@ public class EliScreen extends Screen {
         }
 
         y += 4;
-        addRenderableWidget(new StringWidget(x, y, W, 10, purple("elihelper.section.tools"), this.font).alignCenter());
+        addRenderableWidget(centered(this.font, purple("elihelper.section.tools"), x, y, W));
         y += 14;
         addRenderableWidget(Button.builder(Component.translatable("elihelper.colors"),
                 b -> this.minecraft.setScreen(new ColorScreen(this))).bounds(x, y, W / 2 - 2, H).build());
@@ -57,7 +63,7 @@ public class EliScreen extends Screen {
                 b -> this.minecraft.setScreen(new StatsScreen(this))).bounds(x + W / 2 + 2, y, W / 2 - 2, H).build());
         y += H + GAP + 4;
 
-        addRenderableWidget(new StringWidget(x, y, W, 10, purple("elihelper.section.macros"), this.font).alignCenter());
+        addRenderableWidget(centered(this.font, purple("elihelper.section.macros"), x, y, W));
         y += 14;
         for (String key : new String[]{"elihelper.sell", "elihelper.order"}) {
             Button b = Button.builder(Component.translatable(key), btn -> {}).bounds(x, y, W, H).build();
