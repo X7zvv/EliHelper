@@ -32,9 +32,9 @@ public class ColorScreen extends Screen {
         int y = Math.max(10, (this.height - 190) / 2);
         pl = x - 12; pr = x + W + 12; pt = y - 8;
 
-        addRenderableWidget(new StringWidget(x, y + 2, W, 12,
+        addRenderableWidget(EliScreen.centered(this.font,
                 Component.translatable("elihelper.colors").withStyle(Style.EMPTY.withBold(true).withColor(EliScreen.TEXT_PURPLE)),
-                this.font).alignCenter());
+                x, y + 2, W));
         y += 20;
 
         String old = input == null ? "" : input.getValue();
@@ -44,14 +44,13 @@ public class ColorScreen extends Screen {
         addRenderableWidget(input);
         y += H + 6;
 
-        preview = new StringWidget(x, y, W, 12, Component.empty(), this.font).alignCenter();
+        preview = new StringWidget(x, y, W, 12, Component.empty(), this.font);
         addRenderableWidget(preview);
         y += 14;
-        counter = new StringWidget(x, y, W, 12, Component.empty(), this.font).alignCenter();
+        counter = new StringWidget(x, y, W, 12, Component.empty(), this.font);
         addRenderableWidget(counter);
         y += 18;
 
-        // 16 Farben in zwei Reihen
         int cw = W / 8;
         for (int i = 0; i < 16; i++) {
             char c = CODES.charAt(i);
@@ -62,7 +61,6 @@ public class ColorScreen extends Screen {
         }
         y += 2 * (H + 2) + 4;
 
-        // Formate
         String[][] fmts = {{"l", "B"}, {"o", "I"}, {"n", "U"}, {"m", "S"}, {"k", "?"}, {"r", "R"}};
         int fw = W / fmts.length;
         for (int i = 0; i < fmts.length; i++) {
@@ -72,7 +70,6 @@ public class ColorScreen extends Screen {
         }
         y += H + 6;
 
-        // Hex
         hexInput = new EditBox(this.font, x, y, 90, H, Component.literal("RRGGBB"));
         hexInput.setMaxLength(6);
         hexInput.setHint(Component.literal("RRGGBB"));
@@ -83,7 +80,6 @@ public class ColorScreen extends Screen {
         }).bounds(x + 94, y, W - 94, H).build());
         y += H + 6;
 
-        // Modus + Kopieren
         addRenderableWidget(Button.builder(Component.literal(signMode ? "/sign" : "/rename"), b -> {
             signMode = !signMode;
             b.setMessage(Component.literal(signMode ? "/sign" : "/rename"));
