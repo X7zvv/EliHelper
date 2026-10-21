@@ -25,7 +25,6 @@ public class StatsScreen extends Screen {
 
     private StringWidget line(int x, int y) {
         StringWidget w = new StringWidget(x, y, W, 11, Component.empty(), this.font);
-        w.alignCenter();
         addRenderableWidget(w);
         return w;
     }
@@ -36,9 +35,9 @@ public class StatsScreen extends Screen {
         int y = Math.max(10, (this.height - 250) / 2);
         pl = x - 12; pr = x + W + 12; pt = y - 8;
 
-        addRenderableWidget(new StringWidget(x, y + 2, W, 12,
+        addRenderableWidget(EliScreen.centered(this.font,
                 Component.translatable("elihelper.stats").withStyle(Style.EMPTY.withBold(true).withColor(EliScreen.TEXT_PURPLE)),
-                this.font).alignCenter());
+                x, y + 2, W));
         y += 22;
 
         lSession = line(x, y); y += 13;
@@ -46,7 +45,7 @@ public class StatsScreen extends Screen {
         l24h = line(x, y); y += 13;
         lHour = line(x, y); y += 20;
 
-        addRenderableWidget(new StringWidget(x, y, W, 10, EliScreen.purple("elihelper.minutetest"), this.font).alignCenter());
+        addRenderableWidget(EliScreen.centered(this.font, EliScreen.purple("elihelper.minutetest"), x, y, W));
         y += 14;
 
         multiBox = new EditBox(this.font, x, y, 120, H, Component.literal("Multi"));
