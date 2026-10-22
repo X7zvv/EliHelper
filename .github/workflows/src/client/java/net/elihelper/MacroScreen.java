@@ -35,7 +35,7 @@ public class MacroScreen extends Screen {
         addRenderableWidget(Button.builder(Component.literal("✕"), b -> onClose())
                 .bounds(pr - 24, pt + 4, 18, 18).build());
         addRenderableWidget(EliScreen.centered(this.font,
-                Component.translatable("elihelper.macros").withStyle(Style.EMPTY.withBold(true).withColor(EliScreen.TEXT_PURPLE)),
+                Component.translatable("elihelper.macros").withStyle(Style.EMPTY.withBold(true).withColor(EliScreen.textPurple())),
                 x, pt + 8, W));
 
         int y = titleBottom + 8;
@@ -139,7 +139,7 @@ public class MacroScreen extends Screen {
                 .replaceAll("\\s+", " ").trim();
         preview.setMessage(Component.translatable("elihelper.macro.preview")
                 .withStyle(Style.EMPTY.withColor(0xFFFFFF))
-                .append(Component.literal(" /" + built).withStyle(Style.EMPTY.withColor(EliScreen.TEXT_PURPLE))));
+                .append(Component.literal(" /" + built).withStyle(Style.EMPTY.withColor(EliScreen.textPurple()))));
 
         if (MacroRunner.running()) {
             status.setMessage(Component.translatable("elihelper.macro.running")
