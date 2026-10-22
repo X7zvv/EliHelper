@@ -105,6 +105,12 @@ public class EliScreen extends Screen {
                 () -> this.minecraft.setScreen(new SettingsScreen(this))));
         all.add(tools);
 
+        Cat hugo = new Cat("HugoSMP");
+        hugo.tiles.add(new Tile("✦ Styles & Cosmetics",
+                () -> st("Crystal, Armor, Sky & mehr", MUTED_COL),
+                () -> this.minecraft.setScreen(new de.elihelper.styles.EliHelperConfigScreen(this))));
+        all.add(hugo);
+
         if (q.isEmpty()) return all;
         List<Cat> out = new ArrayList<>();
         for (Cat c : all) {
