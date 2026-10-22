@@ -15,7 +15,7 @@ public class SettingsScreen extends Screen {
 
     private final Screen parent;
     private EditBox prefix, hexFormat, renameLimit, signLimit, payoutRegex, sellCommand, tpaRegex, tpaAccept;
-    private Button tpaBtn, macroBtn, statsBtn;
+    private Button tpaBtn, macroBtn, statsBtn, themeBtn;
     private int pl, pt, pr, pb, titleBottom, footerTop;
 
     public SettingsScreen(Screen parent) {
@@ -56,6 +56,13 @@ public class SettingsScreen extends Screen {
         caption(x, y, "elihelper.set.tpa"); y += 10;
         tpaRegex = box(x, y, half, c.tpaRegex, "elihelper.set.tparegex");
         tpaAccept = box(x + half + 6, y, W - half - 6, c.tpaAccept, "elihelper.set.tpaaccept"); y += H + 6;
+
+        // Theme + Presets
+        themeBtn = Button.builder(Component.empty(), b -> { Theme.cycle(); }).bounds(x, y, half, H).build();
+        addRenderableWidget(themeBtn);
+        addRenderableWidget(Button.builder(Component.translatable("elihelper.presets"),
+                b -> this.minecraft.setScreen(new PresetScreen(this))).bounds(x + half + 6, y, W - half - 6, H).build());
+        y += H + 6;
 
         // Schalter
         int third = (W - 2 * 4) / 3;
@@ -122,6 +129,9 @@ public class SettingsScreen extends Screen {
         tpaBtn.setMessage(toggleLabel("elihelper.autotpa", c.autoTpaEnabled));
         macroBtn.setMessage(toggleLabel("elihelper.set.macro", c.macroEnabled));
         statsBtn.setMessage(toggleLabel("elihelper.set.stats", c.statsEnabled));
+        themeBtn.setMessage(Component.translatable("elihelper.set.theme")
+                .withStyle(Style.EMPTY.withColor(0xFFFFFF))
+                .append(Component.literal(" " + Theme.current().name).withStyle(Style.EMPTY.withColor(EliScreen.TEXT_PURPLE))));
 
         Chrome.back(graphics, pl, pt, pr, pb, titleBottom, footerTop);
         super.extractRenderState(graphics, mouseX, mouseY, delta);

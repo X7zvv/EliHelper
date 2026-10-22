@@ -79,5 +79,16 @@
   "elihelper.set.tparegex": "TPA-Regex",
   "elihelper.set.tpaaccept": "Annehmen-Befehl",
   "elihelper.set.macro": "Makros",
-  "elihelper.set.stats": "Statistik"
+  "elihelper.set.stats": "Statistik",
+  "elihelper.set.theme": "Theme:",
+  "elihelper.presets": "Presets",
+  "elihelper.preset.name": "Preset-Name",
+  "elihelper.preset.save": "Speichern",
+  "elihelper.preset.none": "Noch keine Presets",
+  "elihelper.preset.load": "Laden",
+  "elihelper.preset.copy": "Code",
+  "elihelper.preset.export": "Aktuellen Code kopieren",
+  "elihelper.preset.code": "Code einfuegen",
+  "elihelper.preset.import": "Importieren",
+  "elihelper.whatsnew.ok": "Los geht's"
 }

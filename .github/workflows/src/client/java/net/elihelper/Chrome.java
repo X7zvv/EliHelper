@@ -3,57 +3,79 @@ package net.elihelper;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 /**
- * Gemeinsames Fenster-Aussehen fuer alle EliHelper-Screens.
- * Nutzt bewusst NUR g.fill(...), weil das in dieser MC-Version sicher funktioniert.
+ * Gemeinsames Fenster-Aussehen fuer alle EliHelper-Screens, jetzt themenfaehig
+ * und mit dezenter Animation. Nutzt bewusst NUR g.fill(...).
  *
- * back(...)  wird VOR super.extractRenderState aufgerufen -> liegt hinter den Widgets
- *            (Panel, Titelleiste, Footer, Schatten). Dieses Zeichnen vor super ist der
- *            einzige unsichere Teil, deshalb in try/catch: faellt es aus, bleibt nur das
- *            Panel weg, der Screen rendert normal weiter.
- * front(...) wird NACH super aufgerufen -> scharfe Raender und Akzentlinien liegen oben
- *            (so wie der urspruengliche Rahmen, der schon funktioniert hat).
+ * back(...)  vor super (Panel/Titel/Footer/Schatten), abgesichert, da das
+ *            Zeichnen vor super die einzige unsichere Stelle ist.
+ * front(...) nach super (scharfe Raender + pulsierender Akzent).
  */
 public final class Chrome {
-    public static final int BODY     = 0xF21B1430; // dunkles Lila, fast deckend
-    public static final int TITLEBAR = 0xFF2A1E4D;
-    public static final int FOOTER   = 0xFF201733;
-    public static final int ACCENT   = 0xFF7C3AED; // Haupt-Lila
-    public static final int EDGE     = 0xFFB388FF; // helles Lila
-    public static final int SEP      = 0x55B388FF; // Trennlinie
-    public static final int SHADOW   = 0x66000000;
-
     private Chrome() {}
 
-    /** Grosse Fuellflaechen – vor super. Abgesichert, da das Zeichnen vor super unsicher ist. */
+    private static int scaleAlpha(int color, float f) {
+        int a = (color >>> 24) & 0xFF;
+        a = Math.max(0, Math.min(255, Math.round(a * f)));
+        return (a << 24) | (color & 0xFFFFFF);
+    }
+
+    /** 0.70..1.0 pulsierend, fuer den Akzent. */
+    private static float pulse() {
+        return 0.80f + 0.20f * (float) Math.sin(System.currentTimeMillis() / 480.0);
+    }
+
     public static void back(GuiGraphicsExtractor g, int l, int t, int r, int b, int titleBottom, int footerTop) {
+        back(g, l, t, r, b, titleBottom, footerTop, 1.0f);
+    }
+
+    /** alpha 0..1 fuer den Einblend-Effekt. */
+    public static void back(GuiGraphicsExtractor g, int l, int t, int r, int b, int titleBottom, int footerTop, float alpha) {
         try {
-            g.fill(l + 4, b, r + 4, b + 4, SHADOW);      // Schatten unten
-            g.fill(r, t + 4, r + 4, b + 4, SHADOW);      // Schatten rechts
-            g.fill(l, t, r, b, BODY);                    // Panel
-            g.fill(l, t, r, titleBottom, TITLEBAR);      // Titelleiste
-            g.fill(l, footerTop, r, b, FOOTER);          // Footer
+            Theme th = Theme.current();
+            g.fill(l + 4, b, r + 4, b + 4, scaleAlpha(th.shadow(), alpha));
+            g.fill(r, t + 4, r + 4, b + 4, scaleAlpha(th.shadow(), alpha));
+            g.fill(l, t, r, b, scaleAlpha(th.body, alpha));
+            g.fill(l, t, r, titleBottom, scaleAlpha(th.titlebar, alpha));
+            g.fill(l, footerTop, r, b, scaleAlpha(th.footer, alpha));
+            if (th.festive) {
+                // dezenter wandernder Schimmer in der Titelleiste
+                int w = r - l;
+                int sx = l + (int) ((System.currentTimeMillis() / 20) % Math.max(1, w));
+                g.fill(sx, t, Math.min(r, sx + 14), titleBottom, scaleAlpha(0x22FFFFFF, alpha));
+            }
         } catch (Throwable ignored) {
-            // Rendern laeuft ohne Panel weiter.
         }
     }
 
-    /** Scharfe Raender und Akzente – nach super. */
     public static void front(GuiGraphicsExtractor g, int l, int t, int r, int b, int titleBottom, int footerTop) {
         try {
-            g.fill(l, t, r, t + 2, ACCENT);              // oben
-            g.fill(l, b - 2, r, b, ACCENT);              // unten
-            g.fill(l, t, l + 2, b, EDGE);                // links
-            g.fill(r - 2, t, r, b, EDGE);                // rechts
-            g.fill(l, titleBottom - 1, r, titleBottom, ACCENT); // Linie unter Titel
-            g.fill(l, footerTop, r, footerTop + 1, ACCENT);     // Linie ueber Footer
+            Theme th = Theme.current();
+            int acc = scaleAlpha(th.accent, pulse());
+            g.fill(l, t, r, t + 2, acc);
+            g.fill(l, b - 2, r, b, acc);
+            g.fill(l, t, l + 2, b, th.edge);
+            g.fill(r - 2, t, r, b, th.edge);
+            g.fill(l, titleBottom - 1, r, titleBottom, acc);
+            g.fill(l, footerTop, r, footerTop + 1, acc);
         } catch (Throwable ignored) {
         }
     }
 
-    /** Duenne Trennlinie zwischen Abschnitten. */
     public static void separator(GuiGraphicsExtractor g, int x, int y, int w) {
         try {
-            g.fill(x, y, x + w, y + 1, SEP);
+            g.fill(x, y, x + w, y + 1, Theme.current().sep());
+        } catch (Throwable ignored) {
+        }
+    }
+
+    /** Leuchtender Rahmen um eine Kachel, wenn die Maus drueber ist. */
+    public static void hoverGlow(GuiGraphicsExtractor g, int x, int y, int w, int h) {
+        try {
+            int acc = scaleAlpha(Theme.current().accent, pulse());
+            g.fill(x - 1, y - 1, x + w + 1, y, acc);
+            g.fill(x - 1, y + h, x + w + 1, y + h + 1, acc);
+            g.fill(x - 1, y, x, y + h, acc);
+            g.fill(x + w, y, x + w + 1, y + h, acc);
         } catch (Throwable ignored) {
         }
     }

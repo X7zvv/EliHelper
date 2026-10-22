@@ -1,0 +1,14 @@
+{
+  "version": "1.0",
+  "title": "EliHelper 1.0",
+  "lines": [
+    { "type": "NEW", "text": "Hauptmenue als Kachel-Grid mit Suche" },
+    { "type": "NEW", "text": "7 Farbthemen (Extras-Button rechts unten)" },
+    { "type": "NEW", "text": "Animiertes Menue: Hover-Glow und Akzent-Puls" },
+    { "type": "NEW", "text": "Reiter fuer Befehle / Handel / Werkzeuge" },
+    { "type": "NEW", "text": "Presets speichern und als Code teilen" },
+    { "type": "NEW", "text": "Sell- und Order-Makro mit Stop" },
+    { "type": "NEW", "text": "Auto-TPA (Standard aus, in Einstellungen)" },
+    { "type": "FIX", "text": "Farbcodes: Gradient und Direkt-Senden" }
+  ]
+}

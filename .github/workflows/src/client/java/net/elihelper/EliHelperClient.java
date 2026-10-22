@@ -19,7 +19,10 @@ import java.util.Map;
 
 public class EliHelperClient implements ClientModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("EliHelper");
+    public static final String MENU_VERSION = "1.0";
     public static final int HOTKEY_SLOTS = 4;
+
+    private static boolean whatsNewChecked = false;
 
     public static KeyMapping OPEN_KEY;
     public static KeyMapping SELL_KEY;
@@ -74,6 +77,15 @@ public class EliHelperClient implements ClientModInitializer {
 
             MacroRunner.tick(client);
             SellStats.tick();
+
+            // "What's New" einmal pro Session zeigen, wenn die Version neu ist
+            if (!whatsNewChecked && client.player != null && client.screen == null
+                    && !MENU_VERSION.equals(EliConfig.get().lastSeenVersion)) {
+                whatsNewChecked = true;
+                EliConfig.get().lastSeenVersion = MENU_VERSION;
+                EliConfig.save();
+                client.setScreen(new WhatsNewScreen(null));
+            }
         });
 
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> {

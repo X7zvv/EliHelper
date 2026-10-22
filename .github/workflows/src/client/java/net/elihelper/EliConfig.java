@@ -5,9 +5,11 @@ import com.google.gson.GsonBuilder;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 /** JSON-Config unter .minecraft/config/elihelper.json */
@@ -60,6 +62,19 @@ public final class EliConfig {
     public String tpaRegex = "(?i)(möchte|moechte|wants).*(teleport|tpa)";
     public String tpaAccept = "tpaccept";   // ohne fuehrenden /
 
+    // ---- Menue ----
+    public int themeIndex = 0;              // Farbthema
+    public String lastSeenVersion = "";     // fuer "What's New"
+
+    // ---- Presets ----
+    public static final class NamedPreset {
+        public String name;
+        public String code;   // Base64 der Einstellungen
+        public NamedPreset() {}
+        public NamedPreset(String name, String code) { this.name = name; this.code = code; }
+    }
+    public List<NamedPreset> presets = new ArrayList<>();
+
     private static EliConfig instance = new EliConfig();
     public static EliConfig get() { return instance; }
 
@@ -90,5 +105,47 @@ public final class EliConfig {
         } catch (IOException e) {
             EliHelperClient.LOGGER.warn("Config konnte nicht gespeichert werden", e);
         }
+    }
+
+    // ---- Presets / Teilen-Code ----
+    public static String exportCode() {
+        EliConfig snap = GSON.fromJson(GSON.toJson(instance), EliConfig.class);
+        snap.presets = new ArrayList<>();
+        snap.lastSeenVersion = "";
+        return Base64.getEncoder().encodeToString(GSON.toJson(snap).getBytes(StandardCharsets.UTF_8));
+    }
+
+    public static boolean importCode(String code) {
+        try {
+            String json = new String(Base64.getDecoder().decode(code.trim()), StandardCharsets.UTF_8);
+            EliConfig loaded = GSON.fromJson(json, EliConfig.class);
+            if (loaded == null || loaded.commands == null) return false;
+            loaded.presets = instance.presets;            // vorhandene Presets behalten
+            loaded.lastSeenVersion = instance.lastSeenVersion;
+            instance = loaded;
+            save();
+            return true;
+        } catch (RuntimeException e) {
+            return false;
+        }
+    }
+
+    public static void savePreset(String name) {
+        if (name == null || name.isBlank()) return;
+        String code = exportCode();
+        for (NamedPreset p : instance.presets) {
+            if (p.name != null && p.name.equalsIgnoreCase(name.trim())) { p.code = code; save(); return; }
+        }
+        instance.presets.add(new NamedPreset(name.trim(), code));
+        save();
+    }
+
+    public static boolean applyPreset(NamedPreset p) {
+        return p != null && importCode(p.code);
+    }
+
+    public static void deletePreset(NamedPreset p) {
+        instance.presets.remove(p);
+        save();
     }
 }
