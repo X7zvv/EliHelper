@@ -6,10 +6,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
-import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -38,15 +35,6 @@ public class EliHelperClient implements ClientModInitializer {
         SellStats.load();
         UiTheme.load();
         ExtraTexturePacks.install();
-
-        // Quick access from the ordinary Minecraft title screen.
-        ScreenEvents.AFTER_INIT.register((minecraft, screen, scaledWidth, scaledHeight) -> {
-            if (screen instanceof TitleScreen) {
-                screen.addRenderableWidget(Button.builder(Component.literal("EliHelper • UI-Farbe"),
-                        button -> minecraft.setScreen(new UiThemeScreen(screen)))
-                        .bounds(scaledWidth - 164, 8, 156, 20).build());
-            }
-        });
 
         KeyMapping.Category cat = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("elihelper", "main"));
 
