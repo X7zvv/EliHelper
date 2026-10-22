@@ -45,8 +45,8 @@ public final class UiThemeScreen extends Screen {
     @Override
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         UiTheme.load();
-        super.extractRenderState(graphics, mouseX, mouseY, delta);
         Chrome.back(graphics, left, top, right, bottom, top + 44, bottom - 36);
+        super.extractRenderState(graphics, mouseX, mouseY, delta);
         Chrome.front(graphics, left, top, right, bottom, top + 44, bottom - 36);
     }
 
