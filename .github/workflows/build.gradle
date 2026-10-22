@@ -19,8 +19,11 @@ loom {
     }
 }
 
+def bundledStylesJar = file("EliHelper resource-1.6.0-mc26.1.2.jar")
+
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    compileOnly files(bundledStylesJar)
     // Ab 26.1 gibt es keine Mappings und kein modImplementation mehr
     implementation "net.fabricmc:fabric-loader:${project.loader_version}"
     implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
@@ -37,4 +40,11 @@ java {
     withSourcesJar()
     sourceCompatibility = JavaVersion.VERSION_25
     targetCompatibility = JavaVersion.VERSION_25
+}
+
+
+tasks.named("jar") {
+    if (!bundledStylesJar.exists()) throw new GradleException("Missing bundled module: ${bundledStylesJar}")
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from(zipTree(bundledStylesJar)) { exclude "fabric.mod.json"; exclude "META-INF/**" }
 }
