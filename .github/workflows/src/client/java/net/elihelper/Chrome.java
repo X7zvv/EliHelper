@@ -14,12 +14,12 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
  *            (so wie der urspruengliche Rahmen, der schon funktioniert hat).
  */
 public final class Chrome {
-    public static final int BODY     = 0xF21B1430; // dunkles Lila, fast deckend
-    public static final int TITLEBAR = 0xFF2A1E4D;
-    public static final int FOOTER   = 0xFF201733;
-    public static final int ACCENT   = 0xFF7C3AED; // Haupt-Lila
-    public static final int EDGE     = 0xFFB388FF; // helles Lila
-    public static final int SEP      = 0x55B388FF; // Trennlinie
+    public static int BODY     = 0xF21B1430; // dunkles Lila, fast deckend
+    public static int TITLEBAR = 0xFF2A1E4D;
+    public static int FOOTER   = 0xFF201733;
+    public static int ACCENT   = 0xFF7C3AED; // Haupt-Lila
+    public static int EDGE     = 0xFFB388FF; // helles Lila
+    public static int SEP      = 0x55B388FF; // Trennlinie
     public static final int SHADOW   = 0x66000000;
 
     private Chrome() {}
