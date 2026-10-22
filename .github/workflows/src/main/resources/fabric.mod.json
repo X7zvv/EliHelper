@@ -8,7 +8,8 @@
   "license": "All-Rights-Reserved",
   "environment": "client",
   "entrypoints": {
-    "client": ["net.elihelper.EliHelperClient"]
+    "client": ["net.elihelper.EliHelperClient", "de.elihelper.styles.EliHelperClient"],
+    "modmenu": ["de.elihelper.styles.EliHelperModMenu"]
   },
   "mixins": ["elihelper.mixins.json"],
   "depends": {
