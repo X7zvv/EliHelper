@@ -39,6 +39,20 @@ public final class EliConfig {
     public boolean statsEnabled = true;
     public String payoutRegex = "(?<amount>[0-9][0-9.,]*\\s?[kKmMbB]?)\\s?\\$";
 
+    // ---- Makros (Sell / Order) ----
+    // Nur verwenden, wenn der Server Makros erlaubt.
+    public boolean macroEnabled = true;
+    public String sellCommand = "sell hand";   // ohne fuehrenden /
+    public int sellRepeat = 1;                 // wie oft hintereinander
+    public int sellDelayTicks = 10;            // Abstand zwischen Befehlen (20 Ticks = 1 s)
+    public int macroMaxRepeat = 64;            // harte Obergrenze fuer Sicherheit
+
+    public String orderCommand = "order {item} {amount} {price}"; // Platzhalter werden ersetzt
+    public String orderItem = "";
+    public String orderAmount = "";
+    public String orderPrice = "";
+    public int orderRepeat = 1;
+
     private static EliConfig instance = new EliConfig();
     public static EliConfig get() { return instance; }
 

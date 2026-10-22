@@ -22,6 +22,9 @@ public class EliHelperClient implements ClientModInitializer {
     public static final int HOTKEY_SLOTS = 4;
 
     public static KeyMapping OPEN_KEY;
+    public static KeyMapping SELL_KEY;
+    public static KeyMapping ORDER_KEY;
+    public static KeyMapping STOP_KEY;
     public static final KeyMapping[] HOTKEYS = new KeyMapping[HOTKEY_SLOTS];
 
     private static final Map<Integer, Long> lastPress = new HashMap<>();
@@ -36,6 +39,14 @@ public class EliHelperClient implements ClientModInitializer {
         OPEN_KEY = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.elihelper.open", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_RIGHT_SHIFT, cat));
 
+        // Makro-Tasten: standardmaessig OHNE Taste, du legst sie in der Steuerung fest
+        SELL_KEY = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+                "key.elihelper.sell", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, cat));
+        ORDER_KEY = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+                "key.elihelper.order", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, cat));
+        STOP_KEY = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+                "key.elihelper.stopmacro", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, cat));
+
         // Befehls-Hotkeys: standardmaessig OHNE Taste, du legst sie in der Steuerung selbst fest
         for (int i = 0; i < HOTKEY_SLOTS; i++) {
             HOTKEYS[i] = KeyMappingHelper.registerKeyMapping(new KeyMapping(
@@ -46,11 +57,22 @@ public class EliHelperClient implements ClientModInitializer {
             while (OPEN_KEY.consumeClick()) {
                 if (client.screen == null) client.setScreen(new EliScreen());
             }
+            // Stop darf immer, auch wenn ein Menue offen ist
+            while (STOP_KEY.consumeClick()) MacroRunner.stop();
+
             for (int i = 0; i < HOTKEY_SLOTS; i++) {
                 while (HOTKEYS[i].consumeClick()) {
                     if (client.screen == null) triggerSlot(client, i + 1);
                 }
             }
+            while (SELL_KEY.consumeClick()) {
+                if (client.screen == null) MacroRunner.startSell(client);
+            }
+            while (ORDER_KEY.consumeClick()) {
+                if (client.screen == null) MacroRunner.startOrder(client);
+            }
+
+            MacroRunner.tick(client);
             SellStats.tick();
         });
 

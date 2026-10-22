@@ -1,5 +1,6 @@
 package net.elihelper;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -8,16 +9,16 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 
-/** Editor fuer farbige Namen (/rename, /sign): Vorschau, Zeichenzaehler, Kopieren. */
+/** Editor fuer farbige Namen (/rename, /sign): Vorschau, Zeichenzaehler, Gradient, Kopieren, Senden. */
 public class ColorScreen extends Screen {
     private static final int W = 260, H = 20;
     private static final String CODES = "0123456789abcdef";
 
     private final Screen parent;
-    private EditBox input, hexInput;
+    private EditBox input, hexInput, startHex, endHex;
     private StringWidget preview, counter;
     private boolean signMode = false;
-    private int pl, pt, pr, pb;
+    private int pl, pt, pr, pb, titleBottom, footerTop;
 
     public ColorScreen(Screen parent) {
         super(Component.translatable("elihelper.colors"));
@@ -29,13 +30,16 @@ public class ColorScreen extends Screen {
     @Override
     protected void init() {
         int x = (this.width - W) / 2;
-        int y = Math.max(10, (this.height - 190) / 2);
-        pl = x - 12; pr = x + W + 12; pt = y - 8;
+        int top = Math.max(8, (this.height - 300) / 2);
+        pl = x - 14; pr = x + W + 14; pt = top; titleBottom = pt + 26;
 
+        addRenderableWidget(Button.builder(Component.literal("✕"), b -> onClose())
+                .bounds(pr - 24, pt + 4, 18, 18).build());
         addRenderableWidget(EliScreen.centered(this.font,
                 Component.translatable("elihelper.colors").withStyle(Style.EMPTY.withBold(true).withColor(EliScreen.TEXT_PURPLE)),
-                x, y + 2, W));
-        y += 20;
+                x, pt + 8, W));
+
+        int y = titleBottom + 8;
 
         String old = input == null ? "" : input.getValue();
         input = new EditBox(this.font, x, y, W, H, Component.literal("Text"));
@@ -55,7 +59,7 @@ public class ColorScreen extends Screen {
         for (int i = 0; i < 16; i++) {
             char c = CODES.charAt(i);
             int rgb = ColorCodes.COLORS.get(c);
-            Component label = Component.literal("\u25A0").withStyle(Style.EMPTY.withColor(rgb == 0 ? 0x333333 : rgb));
+            Component label = Component.literal("■").withStyle(Style.EMPTY.withColor(rgb == 0 ? 0x333333 : rgb));
             addRenderableWidget(Button.builder(label, b -> insert(prefix() + c))
                     .bounds(x + (i % 8) * cw, y + (i / 8) * (H + 2), cw - 2, H).build());
         }
@@ -80,19 +84,58 @@ public class ColorScreen extends Screen {
         }).bounds(x + 94, y, W - 94, H).build());
         y += H + 6;
 
+        // Gradient: Start-Hex + End-Hex + Knopf
+        int third = (W - 8) / 3;
+        startHex = new EditBox(this.font, x, y, third, H, Component.literal("Start"));
+        startHex.setMaxLength(6);
+        startHex.setHint(Component.translatable("elihelper.gradient.start"));
+        addRenderableWidget(startHex);
+        endHex = new EditBox(this.font, x + third + 4, y, third, H, Component.literal("End"));
+        endHex.setMaxLength(6);
+        endHex.setHint(Component.translatable("elihelper.gradient.end"));
+        addRenderableWidget(endHex);
+        addRenderableWidget(Button.builder(Component.translatable("elihelper.gradient"), b -> {
+            String g = ColorCodes.gradient(input.getValue(), startHex.getValue(), endHex.getValue(),
+                    prefix(), EliConfig.get().hexFormat);
+            input.setValue(g);
+            setFocused(input);
+        }).bounds(x + 2 * (third + 4), y, W - 2 * (third + 4), H).build());
+        y += H + 6;
+
+        // /rename <-> /sign + Kopieren + Senden
         addRenderableWidget(Button.builder(Component.literal(signMode ? "/sign" : "/rename"), b -> {
             signMode = !signMode;
             b.setMessage(Component.literal(signMode ? "/sign" : "/rename"));
-        }).bounds(x, y, 80, H).build());
+        }).bounds(x, y, 70, H).build());
         addRenderableWidget(Button.builder(Component.translatable("elihelper.copy"), b -> {
-            String cmd = (signMode ? "/sign " : "/rename ") + input.getValue();
-            this.minecraft.keyboardHandler.setClipboard(cmd);
-        }).bounds(x + 84, y, W - 84, H).build());
+            this.minecraft.keyboardHandler.setClipboard(fullCommand());
+        }).bounds(x + 74, y, (W - 74 - 4) / 2, H).build());
+        addRenderableWidget(Button.builder(Component.translatable("elihelper.send"), b -> send())
+                .bounds(x + 74 + (W - 74 - 4) / 2 + 4, y, W - 74 - 4 - (W - 74 - 4) / 2, H).build());
         y += H + 6;
 
+        // Footer: Leeren + Zurueck
+        footerTop = y - 6;
+        int half = (W - 4) / 2;
+        addRenderableWidget(Button.builder(Component.translatable("elihelper.clear"), b -> {
+            input.setValue("");
+            setFocused(input);
+        }).bounds(x, y, half, H).build());
         addRenderableWidget(Button.builder(Component.translatable("elihelper.back"), b -> onClose())
-                .bounds(x, y, W, H).build());
+                .bounds(x + half + 4, y, W - half - 4, H).build());
         pb = y + H + 8;
+    }
+
+    private String fullCommand() {
+        return (signMode ? "/sign " : "/rename ") + input.getValue();
+    }
+
+    private void send() {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) return;
+        String cmd = fullCommand();
+        this.onClose();
+        mc.player.connection.sendCommand(cmd.startsWith("/") ? cmd.substring(1) : cmd);
     }
 
     private void insert(String s) {
@@ -108,8 +151,10 @@ public class ColorScreen extends Screen {
         preview.setMessage(text.isEmpty() ? Component.empty() : ColorCodes.parse(text, prefix()));
         counter.setMessage(Component.literal(text.length() + " / " + limit)
                 .withStyle(Style.EMPTY.withColor(over ? 0xFF5555 : EliScreen.TEXT_PURPLE)));
+
+        Chrome.back(graphics, pl, pt, pr, pb, titleBottom, footerTop);
         super.extractRenderState(graphics, mouseX, mouseY, delta);
-        EliScreen.frame(graphics, pl, pt, pr, pb);
+        Chrome.front(graphics, pl, pt, pr, pb, titleBottom, footerTop);
     }
 
     @Override

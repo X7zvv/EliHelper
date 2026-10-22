@@ -75,4 +75,67 @@ public final class ColorCodes {
         for (int k = 0; k < 6; k++) if (Character.digit(s.charAt(k), 16) < 0) return false;
         return true;
     }
+
+    /** Entfernt alle Farb-/Format-Codes (prefix+Code und prefix+#RRGGBB), laesst nur den Text. */
+    public static String stripCodes(String s, String prefix) {
+        if (s == null || s.isEmpty()) return "";
+        StringBuilder out = new StringBuilder();
+        int i = 0;
+        while (i < s.length()) {
+            if (!prefix.isEmpty() && s.startsWith(prefix, i)) {
+                int j = i + prefix.length();
+                if (j + 7 <= s.length() && s.charAt(j) == '#' && isHex(s.substring(j + 1, j + 7))) {
+                    i = j + 7; continue;
+                }
+                if (j < s.length()) {
+                    char c = Character.toLowerCase(s.charAt(j));
+                    if (COLORS.containsKey(c) || "lonmkr".indexOf(c) >= 0) { i = j + 1; continue; }
+                }
+            }
+            out.append(s.charAt(i));
+            i++;
+        }
+        return out.toString();
+    }
+
+    /**
+     * Faerbt den Text als Farbverlauf von startHex nach endHex ein.
+     * Bestehende Codes werden vorher entfernt. Jeder Buchstabe bekommt sein eigenes &#RRGGBB.
+     */
+    public static String gradient(String text, String startHex, String endHex, String prefix, String hexFormat) {
+        String plain = stripCodes(text, prefix);
+        if (plain.isEmpty()) return text;
+        int[] a = rgb(startHex), b = rgb(endHex);
+        if (a == null || b == null) return text;
+        StringBuilder out = new StringBuilder();
+        int n = plain.length();
+        int ci = 0; // Index nur fuer sichtbare Zeichen (Leerzeichen bekommen keinen Code)
+        int visible = 0;
+        for (int k = 0; k < n; k++) if (plain.charAt(k) != ' ') visible++;
+        int denom = Math.max(1, visible - 1);
+        for (int k = 0; k < n; k++) {
+            char ch = plain.charAt(k);
+            if (ch == ' ') { out.append(' '); continue; }
+            double tt = visible <= 1 ? 0.0 : (double) ci / denom;
+            int r = (int) Math.round(a[0] + (b[0] - a[0]) * tt);
+            int g = (int) Math.round(a[1] + (b[1] - a[1]) * tt);
+            int bl = (int) Math.round(a[2] + (b[2] - a[2]) * tt);
+            out.append(String.format(hexFormat, String.format("%02X%02X%02X", r, g, bl)));
+            out.append(ch);
+            ci++;
+        }
+        return out.toString();
+    }
+
+    private static int[] rgb(String hex) {
+        if (hex == null) return null;
+        hex = hex.trim();
+        if (hex.startsWith("#")) hex = hex.substring(1);
+        if (!isHex(hex)) return null;
+        return new int[]{
+                Integer.parseInt(hex.substring(0, 2), 16),
+                Integer.parseInt(hex.substring(2, 4), 16),
+                Integer.parseInt(hex.substring(4, 6), 16)
+        };
+    }
 }
