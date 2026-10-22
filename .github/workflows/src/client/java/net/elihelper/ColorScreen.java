@@ -36,7 +36,7 @@ public class ColorScreen extends Screen {
         addRenderableWidget(Button.builder(Component.literal("✕"), b -> onClose())
                 .bounds(pr - 24, pt + 4, 18, 18).build());
         addRenderableWidget(EliScreen.centered(this.font,
-                Component.translatable("elihelper.colors").withStyle(Style.EMPTY.withBold(true).withColor(EliScreen.TEXT_PURPLE)),
+                Component.translatable("elihelper.colors").withStyle(Style.EMPTY.withBold(true).withColor(EliScreen.textPurple())),
                 x, pt + 8, W));
 
         int y = titleBottom + 8;
@@ -150,7 +150,7 @@ public class ColorScreen extends Screen {
         boolean over = text.length() > limit;
         preview.setMessage(text.isEmpty() ? Component.empty() : ColorCodes.parse(text, prefix()));
         counter.setMessage(Component.literal(text.length() + " / " + limit)
-                .withStyle(Style.EMPTY.withColor(over ? 0xFF5555 : EliScreen.TEXT_PURPLE)));
+                .withStyle(Style.EMPTY.withColor(over ? 0xFF5555 : EliScreen.textPurple())));
 
         Chrome.back(graphics, pl, pt, pr, pb, titleBottom, footerTop);
         super.extractRenderState(graphics, mouseX, mouseY, delta);
