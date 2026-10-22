@@ -15,8 +15,9 @@ public class StatsScreen extends Screen {
     private final Screen parent;
     private StringWidget lSession, lAll, l24h, lHour, lTest, lResult, lProj;
     private EditBox multiBox, targetBox;
-    private Button testBtn;
-    private int pl, pt, pr, pb;
+    private Button testBtn, pauseBtn;
+    private int pl, pt, pr, pb, titleBottom, footerTop;
+    private int sep1;
 
     public StatsScreen(Screen parent) {
         super(Component.translatable("elihelper.stats"));
@@ -32,18 +33,23 @@ public class StatsScreen extends Screen {
     @Override
     protected void init() {
         int x = (this.width - W) / 2;
-        int y = Math.max(10, (this.height - 250) / 2);
-        pl = x - 12; pr = x + W + 12; pt = y - 8;
+        int top = Math.max(8, (this.height - 290) / 2);
+        pl = x - 14; pr = x + W + 14; pt = top; titleBottom = pt + 26;
 
+        addRenderableWidget(Button.builder(Component.literal("✕"), b -> onClose())
+                .bounds(pr - 24, pt + 4, 18, 18).build());
         addRenderableWidget(EliScreen.centered(this.font,
                 Component.translatable("elihelper.stats").withStyle(Style.EMPTY.withBold(true).withColor(EliScreen.TEXT_PURPLE)),
-                x, y + 2, W));
-        y += 22;
+                x, pt + 8, W));
+
+        int y = titleBottom + 8;
 
         lSession = line(x, y); y += 13;
         lAll = line(x, y); y += 13;
         l24h = line(x, y); y += 13;
-        lHour = line(x, y); y += 20;
+        lHour = line(x, y); y += 10;
+
+        sep1 = y; y += 8;
 
         addRenderableWidget(EliScreen.centered(this.font, EliScreen.purple("elihelper.minutetest"), x, y, W));
         y += 14;
@@ -69,12 +75,23 @@ public class StatsScreen extends Screen {
 
         lTest = line(x, y); y += 13;
         lResult = line(x, y); y += 13;
-        lProj = line(x, y); y += 20;
+        lProj = line(x, y); y += 18;
 
+        // Tracking an/aus
+        pauseBtn = Button.builder(Component.empty(), b -> {
+            EliConfig.get().statsEnabled = !EliConfig.get().statsEnabled;
+            EliConfig.save();
+        }).bounds(x, y, W, H).build();
+        addRenderableWidget(pauseBtn);
+        y += H + 6;
+
+        // Footer
+        footerTop = y - 6;
+        int half = (W - 4) / 2;
         addRenderableWidget(Button.builder(Component.translatable("elihelper.reset"), b -> SellStats.resetSession())
-                .bounds(x, y, W / 2 - 2, H).build());
+                .bounds(x, y, half, H).build());
         addRenderableWidget(Button.builder(Component.translatable("elihelper.back"), b -> onClose())
-                .bounds(x + W / 2 + 2, y, W / 2 - 2, H).build());
+                .bounds(x + half + 4, y, W - half - 4, H).build());
         pb = y + H + 8;
     }
 
@@ -108,6 +125,10 @@ public class StatsScreen extends Screen {
             lTest.setMessage(Component.empty());
         }
 
+        boolean on = EliConfig.get().statsEnabled;
+        pauseBtn.setMessage(Component.translatable(on ? "elihelper.stats.pause" : "elihelper.stats.resume")
+                .withStyle(Style.EMPTY.withColor(on ? 0xFFFFFF : 0xFF8855)));
+
         SellStats.TestResult r = SellStats.lastTest();
         if (r == null) {
             lResult.setMessage(Component.translatable("elihelper.test.none")
@@ -121,8 +142,10 @@ public class StatsScreen extends Screen {
                     target + "x: " + SellStats.fmt(perMin) + "/min | " + SellStats.fmt(perMin * 60) + "/h"));
         }
 
+        Chrome.back(graphics, pl, pt, pr, pb, titleBottom, footerTop);
         super.extractRenderState(graphics, mouseX, mouseY, delta);
-        EliScreen.frame(graphics, pl, pt, pr, pb);
+        Chrome.front(graphics, pl, pt, pr, pb, titleBottom, footerTop);
+        Chrome.separator(graphics, pl + 10, sep1, pr - pl - 20);
     }
 
     @Override
