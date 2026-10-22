@@ -33,7 +33,7 @@ public class SettingsScreen extends Screen {
         addRenderableWidget(Button.builder(Component.literal("✕"), b -> onClose())
                 .bounds(pr - 24, pt + 4, 18, 18).build());
         addRenderableWidget(EliScreen.centered(this.font,
-                Component.translatable("elihelper.settings").withStyle(Style.EMPTY.withBold(true).withColor(EliScreen.TEXT_PURPLE)),
+                Component.translatable("elihelper.settings").withStyle(Style.EMPTY.withBold(true).withColor(EliScreen.textPurple())),
                 x, pt + 8, W));
 
         int y = titleBottom + 6;
@@ -76,7 +76,7 @@ public class SettingsScreen extends Screen {
 
     private void caption(int x, int y, String key) {
         addRenderableWidget(new StringWidget(x + 1, y, W, 9,
-                Component.translatable(key).withStyle(Style.EMPTY.withColor(EliScreen.TEXT_PURPLE)), this.font));
+                Component.translatable(key).withStyle(Style.EMPTY.withColor(EliScreen.textPurple())), this.font));
     }
 
     private EditBox box(int x, int y, int w, String value, String hintKey) {
