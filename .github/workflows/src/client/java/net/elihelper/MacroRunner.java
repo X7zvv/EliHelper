@@ -58,6 +58,8 @@ public final class MacroRunner {
     }
 
     // ---- Sell ----
+    public static void startSellCurrent() { startSell(Minecraft.getInstance()); }
+
     public static void startSell(Minecraft mc) {
         EliConfig c = EliConfig.get();
         if (!c.macroEnabled) { overlay(mc, "Makros sind aus (Config)"); return; }

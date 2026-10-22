@@ -53,6 +53,13 @@ public final class EliConfig {
     public String orderPrice = "";
     public int orderRepeat = 1;
 
+    // ---- Auto-TPA ----
+    // Standard AUS: andere koennten sich sonst ungefragt zu dir teleportieren.
+    public boolean autoTpaEnabled = false;
+    // Regex auf die Teleport-Anfrage im Chat. Bei Treffer wird tpaAccept gesendet.
+    public String tpaRegex = "(?i)(möchte|moechte|wants).*(teleport|tpa)";
+    public String tpaAccept = "tpaccept";   // ohne fuehrenden /
+
     private static EliConfig instance = new EliConfig();
     public static EliConfig get() { return instance; }
 
