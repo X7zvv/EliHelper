@@ -77,7 +77,11 @@ public class EliHelperClient implements ClientModInitializer {
         });
 
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
-            if (!overlay) SellStats.onChat(message.getString());
+            if (!overlay) {
+                String text = message.getString();
+                SellStats.onChat(text);
+                AutoTpa.onChat(text);
+            }
         });
 
         ClientLifecycleEvents.CLIENT_STOPPING.register(c -> SellStats.save());
