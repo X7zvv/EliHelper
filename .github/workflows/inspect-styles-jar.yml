@@ -1,0 +1,50 @@
+name: Inspect EliHelper styles JAR
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: List JAR contents
+        shell: bash
+        run: |
+          set -euo pipefail
+          JAR=".github/workflows/EliHelper resource-1.6.0-mc26.1.2.jar"
+
+          if [[ ! -f "$JAR" ]]; then
+            echo "::error::JAR not found: $JAR"
+            exit 1
+          fi
+
+          echo "=== JAR entries ==="
+          unzip -Z1 "$JAR" | tee styles-jar-files.txt
+
+          echo
+          echo "=== Manifest (if present) ==="
+          if unzip -Z1 "$JAR" | grep -Fxq 'META-INF/MANIFEST.MF'; then
+            unzip -p "$JAR" META-INF/MANIFEST.MF | tee styles-jar-manifest.txt
+          else
+            echo "No META-INF/MANIFEST.MF found."
+            printf 'No manifest found.\n' > styles-jar-manifest.txt
+          fi
+
+          echo
+          echo "=== Likely entrypoint/config/mixin classes ==="
+          grep -Ei '(^|/)(fabric\.mod\.json|.*(Client|Config|Mixin|ModMenu).*\.class|.*\.mixins\.json)$' styles-jar-files.txt || true
+
+      - name: Upload inspection report
+        uses: actions/upload-artifact@v4
+        with:
+          name: elihelper-styles-jar-inspection
+          path: |
+            styles-jar-files.txt
+            styles-jar-manifest.txt
+          if-no-files-found: error
