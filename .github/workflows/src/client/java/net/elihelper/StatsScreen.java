@@ -39,7 +39,7 @@ public class StatsScreen extends Screen {
         addRenderableWidget(Button.builder(Component.literal("✕"), b -> onClose())
                 .bounds(pr - 24, pt + 4, 18, 18).build());
         addRenderableWidget(EliScreen.centered(this.font,
-                Component.translatable("elihelper.stats").withStyle(Style.EMPTY.withBold(true).withColor(EliScreen.TEXT_PURPLE)),
+                Component.translatable("elihelper.stats").withStyle(Style.EMPTY.withBold(true).withColor(EliScreen.textPurple())),
                 x, pt + 8, W));
 
         int y = titleBottom + 8;
@@ -106,7 +106,7 @@ public class StatsScreen extends Screen {
 
     private static Component t(String key, String value) {
         return Component.translatable(key).withStyle(Style.EMPTY.withColor(0xFFFFFF))
-                .append(Component.literal(" " + value).withStyle(Style.EMPTY.withColor(EliScreen.TEXT_PURPLE)));
+                .append(Component.literal(" " + value).withStyle(Style.EMPTY.withColor(EliScreen.textPurple())));
     }
 
     @Override
