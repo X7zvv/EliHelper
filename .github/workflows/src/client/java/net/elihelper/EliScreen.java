@@ -19,14 +19,14 @@ import java.util.function.Supplier;
 public class EliScreen extends Screen {
     static final int PURPLE_MAIN = 0xFF7C3AED;
     static final int PURPLE_LIGHT = 0xFFB388FF;
-    static final int TEXT_PURPLE = 0xB388FF;
+    static int textPurple() { return UiTheme.text(); }
 
     static final int TITLE_COL  = 0xE8E0FF;
     static final int ON_COL     = 0x66FF99;
     static final int OFF_COL    = 0xFF6B6B;
     static final int MUTED_COL  = 0x9A93B5;
 
-    private static final int W = 300, TILE_H = 30, GAP = 4, H = 20;
+    private static final int W = 340, TILE_H = 34, GAP = 7, H = 22;
 
     private int panelLeft, panelTop, panelRight, panelBottom, titleBottom, footerTop;
     private final List<Integer> catSeps = new ArrayList<>();
@@ -55,7 +55,7 @@ public class EliScreen extends Screen {
     }
 
     static Component purple(String key) {
-        return Component.translatable(key).withStyle(Style.EMPTY.withColor(TEXT_PURPLE));
+        return Component.translatable(key).withStyle(Style.EMPTY.withColor(textPurple()));
     }
     static StringWidget centered(Font font, Component c, int x, int y, int w) {
         int tw = font.width(c);
@@ -109,6 +109,12 @@ public class EliScreen extends Screen {
         hugo.tiles.add(new Tile("✦ Styles & Cosmetics",
                 () -> st("Crystal, Armor, Sky & mehr", MUTED_COL),
                 () -> this.minecraft.setScreen(new de.elihelper.styles.EliHelperConfigScreen(this))));
+        hugo.tiles.add(new Tile("◈ Mehr Texturpacks",
+                () -> st("Stone, Ores & Swords", MUTED_COL),
+                () -> this.minecraft.setScreen(new de.elihelper.styles.EliHelperConfigScreen(this))));
+        hugo.tiles.add(new Tile("● UI-Farbe ändern",
+                () -> st(UiTheme.NAMES[UiTheme.selected()], textPurple()),
+                () -> this.minecraft.setScreen(new UiThemeScreen(this))));
         all.add(hugo);
 
         if (q.isEmpty()) return all;
@@ -165,7 +171,7 @@ public class EliScreen extends Screen {
         for (Cat c : cats) {
             addRenderableWidget(new StringWidget(x0 + 2, y,
                     this.font.width(Component.literal(c.name)), 10,
-                    Component.literal(c.name).withStyle(Style.EMPTY.withColor(TEXT_PURPLE).withBold(true)), this.font));
+                    Component.literal(c.name).withStyle(Style.EMPTY.withColor(textPurple()).withBold(true)), this.font));
             y += 13;
             catSeps.add(y - 2);
             y += 1;
