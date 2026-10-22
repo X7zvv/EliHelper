@@ -1,6 +1,6 @@
 package net.elihelper;
 
-import net.minecraft.client.Minecraft;
+import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -50,7 +50,7 @@ public final class UiTheme {
     }
 
     private static Path file() {
-        return Minecraft.getInstance().gameDirectory.toPath().resolve("config/elihelper-ui.properties");
+        return FabricLoader.getInstance().getConfigDir().resolve("elihelper-ui.properties");
     }
 
     private static void apply() {
