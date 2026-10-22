@@ -1,11 +1,10 @@
 package net.elihelper;
 
-import net.minecraft.client.Minecraft;
+import net.fabricmc.loader.api.FabricLoader;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,9 +24,9 @@ public final class ExtraTexturePacks {
     private ExtraTexturePacks() {}
 
     public static void install() {
-        Path root = Minecraft.getInstance().gameDirectory.toPath().resolve("resourcepacks");
+        Path root = FabricLoader.getInstance().getGameDir().resolve("resourcepacks");
         for (Palette palette : PALETTES) {
-            Path pack = root.resolve("EliHelper_" + palette.id);
+            Path pack = root.resolve(palette.id);
             try {
                 if (Files.exists(pack.resolve("pack.mcmeta"))) continue;
                 Files.createDirectories(pack);
